@@ -72,8 +72,8 @@ calculate_shipping_cost:
 ## Project Structure
 
 ```
-├── intent-script-spec-en.md # IntentScript language specification(Japanese)
-├── intent-script-spec.md    # IntentScript language specification
+├── intent-script-spec-en.md # IntentScript language specification
+├── intent-script-spec.md    # IntentScript language specification(Japanese)
 ├── LICENSE                  # MIT License
 ├── README-en.md             # This file
 └── README.md                # README(Japanese)
