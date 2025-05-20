@@ -54,19 +54,19 @@ Product:
   }
 ```
 
-Japanese or other natural languages can also be used:
+Natural language definitions (e.g., Japanese) are also supported:
 
 ```yaml
-送料の計算:
-  説明: "重さと距離に基づいて送料を計算する"
-  入力:
-    重さ: int{unit: kg}
-    距離: int{unit: km}
-  出力: int
-  計算内容: |
-    基本料金は500円。
-    重さ1kgごとに200円を加算。
-    距離100kmごとに100円を加算。
+calculate_shipping_cost:
+  description: "Calculate shipping cost based on weight and distance"
+  inputs:
+    weight: int{unit: kg}
+    distance: int{unit: km}
+  output: int{currency: JPY}
+  logic: |
+    Base cost is 500 yen.
+    Add 200 yen per kg.
+    Add 100 yen for every 100 km.
 ```
 
 ## Project Structure
