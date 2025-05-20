@@ -54,16 +54,16 @@ IntentScript allows the mixing of different levels of abstraction depending on u
 
 These levels are guidelines, not hard categories.
 
-### Level 1 (Formal)
+### Level 0 (Natural language)
 
-```yaml
-User:
-  name: string{required, max_length: 50}
-  email: string{required, format: "email"}
-  age: int{min: 18}
+```text
+A user has a name, email address, and age.
+The name is required and must be no more than 50 characters.
+The email address must be valid and is also required.
+The age must be at least 18.
 ```
 
-### Level 2 (Mixed)
+### Level 1 (Mixed)
 
 ```yaml
 User:
@@ -72,13 +72,13 @@ User:
   age: number, at least 18
 ```
 
-### Level 3 (Natural language)
+### Level 2 (Formal)
 
-```text
-A user has a name, email address, and age.
-The name is required and must be no more than 50 characters.
-The email address must be valid and is also required.
-The age must be at least 18.
+```yaml
+User:
+  name: string{required, max_length: 50}
+  email: string{required, format: "email"}
+  age: int{min: 18}
 ```
 
 Users can freely move between these levels based on their needs.
@@ -141,9 +141,10 @@ entity:
   name: string  # Inline comment
 ```
 
-Comments are useful for supplementing intent even in formal-level (Level 1) definitions:
+Comments can help clarify intent even in formal-level (Level 2) definitions:
 
 ```yaml
+# This is a Level 2 formal definition, with natural-language comments clarifying the intent
 User:
   name: string{required, max_length: 50}  # Must be filled, max 50 characters
   email: string{required, format: "email"}  # Required and must be valid format
