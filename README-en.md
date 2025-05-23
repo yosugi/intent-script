@@ -11,13 +11,15 @@ Unlike traditional programming languages that focus on how to implement somethin
 
 ### Key Design Principles
 
+* Designed for LLM interpretation and implementation
 * YAML-based syntax (no special parser required)
 * Avoidance of Turing-completeness
 * Support for gradual formality (from natural to structured language)
 * Zero learning curve
-
   * Natural language is acceptable; non-programmers can start using it right away
-* Designed for LLM interpretation and implementation
+* Zero setup cost
+  * Just feed the script to an LLM and it's ready to run
+* AI-driven error handling and flexible exception management
 
 ## Features
 
@@ -25,6 +27,8 @@ Unlike traditional programming languages that focus on how to implement somethin
 * Declarative function definitions for logic and calculations
 * Pipeline syntax for filtering and aggregating data
 * Rich support for comments and natural language annotations
+* Conditional branching for dynamic value switching
+* Extensibility via external definitions
 
 ## Specification
 
@@ -54,7 +58,7 @@ Product:
   }
 ```
 
-Natural language definitions (e.g., Japanese) are also supported:
+Natural language definitions are also supported:
 
 ```yaml
 calculate_shipping_cost:
@@ -81,10 +85,16 @@ calculate_shipping_cost:
 
 ## Future Work
 
-* Template definitions and reuse mechanisms
-* Extended support for dependent types and conditional constraints
+Version 0.0.1 remains a minimal configuration.
+The following items are under consideration for future extension.
+
 * Error handling and validation expression
-* API design for AI-driven bidirectional transformation and autocompletion
+* Enumerated, dependent, and conditional constraint types
+* Composite types (e.g., union/intersection)
+* Generic entity definitions (e.g., User<T>) for reuse
+* Modular package structure for large-scale systems (namespaces and scope management)
+* Template definitions and reuse mechanisms
+* Consistency checking of natural language comments and AI-powered suggestion support
 
 ## Acknowledgements
 

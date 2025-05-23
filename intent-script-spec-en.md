@@ -6,31 +6,29 @@ IntentScript is a language concept designed to express "what to do" to AI.
 While traditional programming languages focus on "how to implement," IntentScript focuses solely on describing intent and objectives.
 
 Its natural-language-friendly expressions and comments are designed with interpretation by LLMs in mind.
-Rather than serving as a static specification language, IntentScript aims to be a collaborative foundation that enables shared and evolving intent between humans and AI.
+Beyond static specification, IntentScript serves as a collaborative foundation for shared and evolving intent between humans and AI.
 
 ## Language Design Principles
 
 * YAML-based syntax
-
   * No dedicated parser needed
   * Aims for a balance between formal and natural language
-
 * Avoidance of Turing-completeness
-
   * Recursive and looping control structures are intentionally excluded
   * Focused on intent structuring, freeing users from implementation details
-
 * Support for gradual formality
-
   * Balances formal rigor with natural-language flexibility
   * Allows coexistence of different abstraction levels within the same system
-
 * Zero learning curve
-
   * Usable by anyone familiar with natural language
   * No prior programming knowledge required
+* Zero setup cost
+  * Supports loading specs from external sources
+  * Scripts can be used directly by pasting into an LLM prompt
+* Flexible AI execution
+  * Error handling and exceptional conditions are delegated to AI judgment
 
-## File Format and Extension
+### File Format and Extension
 
 IntentScript files use the `.is.yml` extension:
 
@@ -47,155 +45,89 @@ Examples:
 
 The filename convention is flexible—only the extension `.is.yml` is required.
 
+## Declaring Used Specifications: include
+
+Use include at the top of a file to explicitly declare which specs or definitions are available.This helps LLMs and tools constrain completion and validation.
+
+```
+include:
+  - raw.githubusercontent.com/yosugi/intent-script/refs/heads/main/intent-script-spec.md
+```
+
+- include must be declared at the top level of the file
+- All types, functions, and operators defined in the included documents become usable in the current script
+
 ## Gradual Formality
 
-"Gradual formality" refers to the spectrum between natural language and strict formal syntax.
+"Gradual formality" refers to the spectrum between natural language and formal syntax.
 IntentScript allows the mixing of different levels of abstraction depending on user preference and context.
 
 These levels are guidelines, not hard categories.
 
-### Level 0 (Natural language)
+### The 3 Levels of Gradual Formality
 
-```text
-A user has a name, email address, and age.
-The name is required and must be no more than 50 characters.
-The email address must be valid and is also required.
-The age must be at least 18.
-```
+* Level 0 (Natural language): Natural language-centered expression, relying on AI intent analysis
+  ```text
+  A user has a name, email address, and age.
+  The name is required and must be no more than 50 characters.
+  The email address must be valid and is also required.
+  The age must be at least 18.
+  ```
 
-### Level 1 (Mixed)
+* Level 1 (Mixed): Combination of structured format and natural language
+  ```yaml
+  User:
+    name: text, required, max 50 characters
+    email: valid email address, required
+    age: number, at least 18
+  ```
 
-```yaml
-User:
-  name: text, required, max 50 characters
-  email: valid email address, required
-  age: number, at least 18
-```
+* Level 2 (Formal): Completely formal syntax, implemented as strict YAML structure
+  ```yaml
+  User:
+    name: string{required, max_length: 50}
+    email: string{required, format: "email"}
+    age: int{min: 18}
+  ```
 
-### Level 2 (Formal)
-
-```yaml
-User:
-  name: string{required, max_length: 50}
-  email: string{required, format: "email"}
-  age: int{min: 18}
-```
-
-Users can freely move between these levels based on their needs.
+Note that these levels are convenient classifications. In practice, there are no clear boundaries, and it forms a continuum from formal notation to natural language.
 
 ## Language Structure and Basic Syntax
 
-### Element Definition
+### Element Definition Format
 
 All definitions in IntentScript (entities, functions, etc.) follow a consistent format:
 
 ```yaml
+# Basic definition example: User entity
 User:
   name: string{required, max_length: 50}
   email: string{required, format: "email"}
   age: int{min: 18}
-```
 
-You may also use the `def` keyword or append metadata as options:
-
-```yaml
+# Definition with def keyword and options: Product entity
 def Product{kind: entity}:
   name: string{required, max_length: 100}
   price: int{currency: JPY}
 ```
 
-* `def` makes it explicit that the block is a definition (useful in formal documentation or large systems)
-* Metadata can indicate the kind or additional attributes of the element
+Element definitions consist of a name followed by a colon (:).
+The definition body consists of indented attribute-value pairs.
 
-## Type System
+When necessary, you can specify the def keyword and options (using {} after the name).
+These two are independent of each other, and either can be used alone.
+Their meanings are as follows:
 
-Supported types:
-
-* Primitive types: `string`, `int`, `boolean`, `date`, etc.
-* Collection types: `list<T>`, `map<K, V>`
-* User-defined types: references to other entities
-
-Example of generics:
-
-```yaml
-order_items: list<Product>
-product_prices: map<string, int>
-```
-
-## Property Options
-
-Properties can use `{}` to specify constraints and annotations:
-
-```yaml
-name: string{required, max_length: 100}
-price: int{currency: JPY}
-```
-
-## Comments and Special Characters (YAML)
-
-IntentScript supports YAML-style comments:
-
-```yaml
-# This is a full-line comment
-entity:
-  name: string  # Inline comment
-```
-
-Comments can help clarify intent even in formal-level (Level 2) definitions:
-
-```yaml
-# This is a Level 2 formal definition, with natural-language comments clarifying the intent
-User:
-  name: string{required, max_length: 50}  # Must be filled, max 50 characters
-  email: string{required, format: "email"}  # Required and must be valid format
-  age: int{min: 18}  # Age must be 18 or older
-```
-
-If special YAML characters are used in expressions (such as `>`, `{`, `|`), quoting them is recommended:
-
-```yaml
-filtered_items: list<int>{
-  derive: "items |> filter(_ > 100)"
-}
-```
-
-## YAML Literals
-
-Standard YAML literal forms are valid:
-
-```yaml
-simple_string: "Hello World"
-multiline_string: |
-  This is a
-  multi-line string
-
-int: 28
-float: 3.14
-
-active: true
-disabled: false
-
-created_at: 2006-01-02T15:04:05Z
-
-colors:
-  - red
-  - green
-  - blue
-
-colors: [red, green, blue]
-
-point:
-  x: 10
-  y: 20
-
-point: {x: 5, y: 15}
-```
-
-## Entities and Data Models
+* def keyword: `def`
+  * Explicitly indicates "this is a definition"
+  * For formal documents or large-scale systems
+* Attributes: `User{kind: entity}:`
+  * Explicitly specify type or additional attributes
+  * For complex systems or when clear type distinction is needed
 
 ### Entity Definition
 
-An entity expresses structured intent about data models and serves as a foundation for AI-generated logic or validation.
+Entity definitions in IntentScript concisely and structurally express the intent of target data structures, serving as the foundation for specification description and AI-generated processing.
 
 ```yaml
 Product:
@@ -208,9 +140,9 @@ Product:
   }
 ```
 
-## Function Definition
+### Function Definition
 
-Functions describe the purpose and structure of processing in a declarative manner, intended for AI-assisted implementation.
+Function definitions in IntentScript explicitly describe the "purpose" and "structure" of processing, adopting a declarative style that assumes AI implementation support.
 
 ```yaml
 calculate_shipping_cost:
@@ -225,10 +157,130 @@ calculate_shipping_cost:
     Add 100 yen for every 100 km.
 ```
 
-## Pipeline Syntax for Data Processing
+<<<<<<< HEAD
+## Function Call Extensions
 
-Pipeline syntax allows intuitive and declarative expression of data flow and transformation.
-Use the `|>` operator to chain operations.
+User-defined functions can be invoked in the following format:
+
+```yaml
+shipping_cost: int{
+  derive: calculate_shipping_cost(weight: 10, distance: 20)
+}
+```
+
+- Function calls use the format: function(arg1, arg2, ...)
+- Arguments may include primitive values, structured types, and expressions such as if(...)
+- Keyword arguments are supported
+    - Keyword argument order is flexible
+- Functions do not cause side effects
+
+## Pipeline Syntax for Data Processing
+=======
+### Type System
+>>>>>>> 368c8c5 (tmp)
+
+IntentScript supports the following types:
+
+* Primitive types: string, int, boolean, date, etc.
+* Collection types: list<T>, map<K,V>
+* User-defined types: references to other entities
+
+Use `<>` notation for generic types:
+```yaml
+order_items: list<Product>
+product_prices: map<string, int>
+```
+
+### Property Options
+
+Properties can use `{}` to specify options:
+
+```yaml
+name: string{required, max_length: 100}
+price: int{currency: JPY}
+```
+
+### YAML Notation: Comments and Special Characters
+
+IntentScript uses YAML comment notation:
+
+```yaml
+# This is a full-line comment
+entity:
+  name: string  # End-of-line comments are also possible
+  # Comments can be indented to match the context
+```
+
+Comments serve as an important complementary function for gradual formality.
+Even when using formally strict descriptions (Level 2), you can add natural language intent explanations through comments:
+
+```yaml
+# This is a Level 2 formal description, but comments supplement the intent in natural language
+User:
+  name: string{required, max_length: 50} # Required, maximum 50 characters allowed
+  email: string{required, format: "email"} # Required and must be in valid format
+  age: int{min: 18} # User age must be 18 or older (adult age)
+```
+
+When using YAML special characters (>, |, *, &, -, ?, :, {, } etc.) in expressions or conditions, it's recommended to enclose them in quotes when necessary.
+
+To prioritize YAML parser compatibility or prevent syntax errors, it's safe to write the entire expression as a string literal like "items |> filter(_ > 100)":
+
+```yaml
+filtered_items: list<int>{
+  derive: "items |> filter(_ > 100)"  # '>' is a special character, so enclose in quotes when needed
+}
+```
+
+### YAML Notation: Literal Notation
+
+IntentScript uses standard YAML literal notation as-is:
+
+```yaml
+# String literals
+simple_string: "Hello World"
+multiline_string: |
+  This is a multi-line
+  string.
+  Indentation is preserved.
+
+# Numeric literals
+int: 28
+float: 3.14
+
+# Boolean literals
+active: true
+disabled: false
+
+# Date-time literals
+created_at: 2006-01-02T15:04:05Z
+
+# List literals - block notation
+colors:
+  - red
+  - green
+  - blue
+
+# List literals - flow notation
+colors: [red, green, blue]
+
+# Map literals - block notation
+point:
+  x: 10
+  y: 20
+
+# Map literals - flow notation
+point: {x: 5, y: 15}
+```
+
+## Data Processing and Pipelines
+
+IntentScript adopts pipeline syntax to enable intuitive and declarative description of processing intent.
+By describing data flow and transformation operations in sequence, it achieves both structure and intent visualization.
+
+### Pipeline Basics
+
+Use the pipeline operator `|>` to intuitively express data processing flow:
 
 ```yaml
 discount_prices: list<int>{
@@ -239,43 +291,45 @@ discount_prices: list<int>{
 }
 ```
 
-### Built-in Pipeline Functions
+### Standard Pipeline Functions
 
-* `map`: transform elements
+IntentScript provides the following basic pipeline operation functions:
 
+* map: transform each element
   ```yaml
+  # Example: double the prices
   doubled_prices: list<int>{
     derive: prices |> map("_ * 2")
   }
   ```
 
-* `filter`: select elements based on condition
-
+* filter: select elements matching a condition
   ```yaml
+  # Example: select only positive numbers
   positive_numbers: list<int>{
     derive: numbers |> filter("_ > 0")
   }
   ```
 
-* `sum`: calculate total
-
+* sum: calculate the total of numbers
   ```yaml
+  # Example: calculate total order amount
   total_amount: int{
     derive: order_items |> map(_.price * _.quantity) |> sum
   }
   ```
 
-* `sort`: order elements
-
+* sort: arrange elements in order
   ```yaml
+  # Example: sort numbers in ascending order
   sorted_values: list<int>{
     derive: values |> sort
   }
   ```
 
-* `reduce`: combine into a single value
-
+* reduce: aggregate elements into a single value
   ```yaml
+  # Example: multiply numbers (cumulative multiplication)
   multiplied_number: int{
     derive: numbers |> reduce("_1 * _2", 1)
   }
@@ -283,98 +337,136 @@ discount_prices: list<int>{
 
 ### Placeholder Syntax
 
-* Single argument: `_` refers to the item, `_.property` refers to a field
+* Single argument: `_` for the entire argument, `_.property` for property reference
+  ```yaml
+  # Single argument example - extract products priced 100 yen or more
+  discounted_prices: list<int>{
+    derive: products
+            |> filter("_.price >= 100") # Extract only products priced 100 yen or more
+  }
+  ```
+
+* Multiple arguments: `_1`, `_2`, `_3`... for each argument reference
+  ```yaml
+  # Multiple argument example - sort numbers in descending order
+  sorted_scores: list<int>{
+    derive: scores
+            |> sort(_2 - _1)  # Sort in descending order (_1 and _2 are the two elements being compared)
+  }
+  ```
+
+### Conditional Expressions: if(...)
+
+IntentScript supports if(condition, then_value, else_value) as a pure expression that returns one of two values depending on a condit
 
 ```yaml
-filtered_products: list<Product>{
-  derive: products |> filter(_.price > 100)
+final_price: int{
+  derive: if(onSale, price * 0.9, price)
 }
 ```
 
-* Multiple arguments: `_1`, `_2`, etc.
-
-```yaml
-sorted_scores: list<int>{
-  derive: scores |> sort(_2 - _1)
-}
-```
+- `then_value` and `else_value` are ideally of the same type, but the details are left to AI interpretation
+- Standard comparison and logical operators are supported
 
 ## Use of Natural Language
 
-Natural language can be used throughout structured definitions and pipeline expressions.
-This enables expressive and flexible descriptions that AI can interpret.
+IntentScript allows natural language to be used anywhere in structured definitions and pipeline processing.
+Based on the concept of gradual formality, formal expressions and natural language can be mixed as needed:
 
-### Attribute Description with Natural Language
+This functionality enables using formal expressions for parts requiring strict structure, while using natural language for detailed explanations, complex rules, and processing steps.
+AI interprets these natural language expressions, understands the intent, and converts them to implementation.
+
+### Usage in Attribute Description
+
+Attributes can be described in natural language as shown below:
 
 ```yaml
 Product:
   name: string{required}
   price: int{currency: JPY}
-  description: "Detailed product description. Supports Markdown."
+  description: "Detailed product description. Can be written in Markdown format."
 
   availability_rule: |
-    Normally available if in stock.
-    For limited items, only members can purchase.
-    Pre-orders accepted two weeks before release.
+    Normally available for purchase if in stock.
+    However, for limited items, only members can purchase.
+    Pre-orders are accepted from 2 weeks before release.
 
   discount_strategy: |
-    - 10% discount for products over 5000 yen
-    - Extra 5% off during sales
-    - Gold members get an additional 5% off at all times
+    - 10% discount for products priced 5000 yen or more
+    - Additional 5% discount during sale periods
+    - Gold members always get an additional 5% discount
 ```
 
-### Natural Language in Pipelines
+### Usage in Pipelines
+
+Pipeline processing content can also be described in natural language:
 
 ```yaml
 top_products: list<Product>{
   derive: products
-          |> "exclude out-of-stock items"
-          |> "sort by sales volume descending"
-          |> "take top 5"
+          |> "exclude out-of-stock products"
+          |> "sort products by sales volume"
+          |> "take only the top 5"
 }
 ```
 
-### Purely Natural Language Definitions
+### Natural Language Definitions
 
-IntentScript also allows purely natural language or comment-based definitions:
+IntentScript allows natural language or comment-based definitions in addition to structured definitions.
+For undefined syntax or functions in particular, it's assumed that the implementation environment (such as LLMs) will complement them.
 
-```yaml
-# average: a function that returns the average of a list of numbers
-```
-
-Such expressions are not formal syntax, but help guide AI and support future extensibility.
-
-## Input and Output Notes
-
-IntentScript focuses on describing intent, not I/O specifics.
-However, optional comments can document expected interfaces:
+For example, new functions can be defined using comments like this:
 
 ```yaml
-# Input: received via stdin in CSV format
-# Output: one line per result to stdout
+# average function calculates the average of numbers
 ```
 
-## Future Considerations
+Such descriptions are not formal syntax, but can be utilized as flexible expressions or designs anticipating future extensions.
 
-While this is a minimal specification for POC purposes, the following extensions are under consideration:
+### Notes on Input/Output
 
-* Error handling and validation mechanisms
-* Enumerated, dependent, and conditional constraint types
-* Composite types (union/intersection)
-* Generic entities (e.g., `User<T>`) to support reuse
-* Package systems for large-scale development
-* `include` support for modular and reusable specs
-* Templates for recurring patterns
-* Semantic validation of comments and natural language
-* AI-assisted clarification and suggestions
+The IntentScript specification focuses on describing intent and excludes specific input/output formats (files, APIs, standard input/output, etc.).
+However, when you want to specify input/output specifications that depend on the execution environment, supplementary description through comments is recommended:
 
+```yaml
+# Input: provided in CSV format from standard input
+# Output: output one line at a time to standard output
+```
+
+<<<<<<< HEAD
 ## About This Document
 
 * Version: 0.0.1
 * Status: Minimal specification for proof-of-concept
+* Guiding principle: Emphasizes flexibility and AI-driven interpretation over exhaustive definition. Ambiguity is intentional, allowing AI and implementers to make appropriate judgments.
 * Authorship: This specification was created through dialogue with generative AI.
   We express our sincere gratitude for its significant contributions to shaping this document.
 * License: MIT License
+=======
+Such comments clarify IntentScript's intent and assist in implementation and verification.
 
-This document is the starting point for evolving IntentScript into a foundational language for communicating intent to AI.
-It is designed to support further experimentation, discussion, and adoption.
+## Future Considerations
+
+While this specification maintains a minimal configuration, the following are issues under consideration for future expansion:
+
+* Error handling and validation
+* Practical notations such as enumerated types, dependent types, and conditional constraints
+* Support for composite types (Union / Intersection types)
+  * Introduction of composite types like int | null and A & B
+* Introduction of generic entity definitions (e.g., User<T>)
+  * Enable entity reuse through type parameters, supporting flexible construction of complex domain models
+* Introduction of package configuration (namespace and scope management) for large-scale development
+* Consideration of `include` functionality enabling definition reuse and split description
+* Templates and other grammar for reuse
+* Consistency verification with natural language comments and AI-based completion/suggestion support for ambiguous expressions
+
+## About This Document
+
+* Version: 0.0.1
+* Status: This specification represents the minimal configuration specification for the POC (Proof of Concept) stage of IntentScript.
+  It is intended for initial design verification and confirmation of the language's effectiveness, positioned as a foundation for future expansion and formal specification.
+* Co-authorship: This specification was created through dialogue with generative AI. We express our gratitude for the significant contributions of generative AI in forming this specification.
+* License: This specification is published under the MIT License.
+>>>>>>> 368c8c5 (tmp)
+
+This document serves as a starting point for developing IntentScript as a "language for conveying intent to AI" and is intended to provide a foundation for future discussion, implementation, and utilization.
