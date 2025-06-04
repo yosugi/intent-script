@@ -96,10 +96,15 @@ Note that these levels are convenient classifications. In practice, there are no
 
 ### Element Definition Format
 
-All definitions in IntentScript (entities, functions, etc.) follow a consistent format:
+All definitions in IntentScript (values, entities, functions, etc.) follow a consistent format:
 
 ```yaml
-# Basic definition example: User entity
+# Value/constant definition examples
+TAX_RATE: 0.1
+DEFAULT_CURRENCY: "JPY"
+SHIPPING_ZONES: [domestic, asia, worldwide]
+
+# Basic entity definition example: User entity
 User:
   name: string{required, max_length: 50}
   email: string{required, format: "email"}
@@ -108,11 +113,11 @@ User:
 # Definition with def keyword and options: Product entity
 def Product{kind: entity}:
   name: string{required, max_length: 100}
-  price: int{currency: JPY}
+  price: int{currency: DEFAULT_CURRENCY}  # Using defined constant
 ```
 
 Element definitions consist of a name followed by a colon (:).
-The definition body consists of indented attribute-value pairs.
+The definition body consists of the value itself, or indented attribute-value pairs.
 
 When necessary, you can specify the def keyword and options (using {} after the name).
 These two are independent of each other, and either can be used alone.
@@ -124,6 +129,33 @@ Their meanings are as follows:
 * Attributes: `User{kind: entity}:`
   * Explicitly specify type or additional attributes
   * For complex systems or when clear type distinction is needed
+
+### Value/Constant Definition
+
+IntentScript allows defining reusable values and constants:
+
+```yaml
+# Simple value definitions
+TAX_RATE: 0.1
+DEFAULT_CURRENCY: "JPY"
+MAX_ORDER_ITEMS: 100
+
+# Complex value definitions
+SHIPPING_ZONES: [domestic, asia, worldwide]
+ERROR_MESSAGES:
+  not_found: "Product not found"
+  out_of_stock: "Out of stock"
+```
+
+Defined values can be referenced within entity and function definitions:
+
+```yaml
+Product:
+  price: int{currency: DEFAULT_CURRENCY}
+  tax_included_price: int{
+    derive: price * (1 + TAX_RATE)
+  }
+```
 
 ### Entity Definition
 

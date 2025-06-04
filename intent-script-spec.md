@@ -98,9 +98,15 @@ IntentScriptでは、ユーザーの意図や状況に応じて、これらの�
 
 ### 要素定義の基本形式
 
-IntentScriptでは、すべての定義（エンティティ、関数など）に一貫した構文を使用する：
+IntentScriptでは、すべての定義（値、エンティティ、関数など）に一貫した構文を使用する：
+
 ```yaml
-# 基本的な定義例：ユーザーエンティティ
+# 値/定数の定義例
+TAX_RATE: 0.1
+DEFAULT_CURRENCY: "JPY"
+SHIPPING_ZONES: [domestic, asia, worldwide]
+
+# 基本的なエンティティ定義例：ユーザーエンティティ
 User:
   name: string{required, max_length: 50}
   email: string{required, format: "email"}
@@ -109,11 +115,11 @@ User:
 # def キーワードとオプション(後述)付きの定義例：商品エンティティ
 def Product{kind: entity}:
   name: string{required, max_length: 100}
-  price: int{currency: JPY}
+  price: int{currency: DEFAULT_CURRENCY}  # 定義した定数を使用
 ```
 
 要素定義は名前、その後にコロン（:）が続く。
-定義の中身は、インデントされた属性と値のペアで構成される。
+定義の中身は、値そのもの、またはインデントされた属性と値のペアで構成される。
 
 必要に応じて、def キーワード、オプション（名前の後の{}）を指定できる。
 この 2 つは互いに独立しており、どちらか一方のみを使用することも可能である。
@@ -125,6 +131,33 @@ def Product{kind: entity}:
 * 属性: `User{kind: entity}:`
   * 種類や追加属性を明示的に指定
   * 複雑なシステムや明確な種類区別が必要な場合
+
+### 値/定数の定義
+
+IntentScriptでは、再利用可能な値や定数を定義できる：
+
+```yaml
+# シンプルな値の定義
+TAX_RATE: 0.1
+DEFAULT_CURRENCY: "JPY"
+MAX_ORDER_ITEMS: 100
+
+# 複合的な値の定義
+SHIPPING_ZONES: [domestic, asia, worldwide]
+ERROR_MESSAGES:
+  not_found: "商品が見つかりません"
+  out_of_stock: "在庫切れです"
+```
+
+定義した値は、エンティティや関数の定義内で参照できる：
+
+```yaml
+Product:
+  price: int{currency: DEFAULT_CURRENCY}
+  tax_included_price: int{
+    derive: price * (1 + TAX_RATE)
+  }
+```
 
 ### エンティティ定義
 
@@ -450,4 +483,3 @@ IntentScript の仕様は、意図の記述に特化しており、具体的な�
 * ライセンス: 本仕様は MIT License に基づいて公開する。
 
 このドキュメントは、IntentScript を「AIに意図を伝えるための言語」として発展させていくための出発点であり、今後の議論・実装・活用の土台となることを意図している。
-
