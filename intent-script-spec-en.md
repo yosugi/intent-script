@@ -54,8 +54,8 @@ include:
   - raw.githubusercontent.com/yosugi/intent-script/refs/heads/main/intent-script-spec.md
 ```
 
-- include must be declared at the top level of the file
-- All types, functions, and operators defined in the included documents become usable in the current script
+* include must be declared at the top level of the file
+* All types, functions, and operators defined in the included documents become usable in the current script
 
 ## Gradual Formality
 
@@ -189,7 +189,6 @@ calculate_shipping_cost:
     Add 100 yen for every 100 km.
 ```
 
-<<<<<<< HEAD
 ## Function Call Extensions
 
 User-defined functions can be invoked in the following format:
@@ -200,22 +199,20 @@ shipping_cost: int{
 }
 ```
 
-- Function calls use the format: function(arg1, arg2, ...)
-- Arguments may include primitive values, structured types, and expressions such as if(...)
-- Keyword arguments are supported
-    - Keyword argument order is flexible
-- Functions do not cause side effects
+* Function calls use the format: function(arg1, arg2, ...)
+* Arguments may include primitive values, structured types, and expressions such as if(...)
+* Keyword arguments are supported
+    * Keyword argument order is flexible
+* Functions do not cause side effects
 
-## Pipeline Syntax for Data Processing
-=======
 ### Type System
->>>>>>> 368c8c5 (tmp)
 
 IntentScript supports the following types:
 
 * Primitive types: string, int, boolean, date, etc.
 * Collection types: list<T>, map<K,V>
 * User-defined types: references to other entities
+* Union types: Express selection from multiple types. Examples: string|null, "active"|"inactive"
 
 Use `<>` notation for generic types:
 ```yaml
@@ -397,8 +394,8 @@ final_price: int{
 }
 ```
 
-- `then_value` and `else_value` are ideally of the same type, but the details are left to AI interpretation
-- Standard comparison and logical operators are supported
+* `then_value` and `else_value` are ideally of the same type, but the details are left to AI interpretation
+* Standard comparison and logical operators are supported
 
 ## Use of Natural Language
 
@@ -465,40 +462,15 @@ However, when you want to specify input/output specifications that depend on the
 # Output: output one line at a time to standard output
 ```
 
-<<<<<<< HEAD
-## About This Document
-
-* Version: 0.0.1
-* Status: Minimal specification for proof-of-concept
-* Guiding principle: Emphasizes flexibility and AI-driven interpretation over exhaustive definition. Ambiguity is intentional, allowing AI and implementers to make appropriate judgments.
-* Authorship: This specification was created through dialogue with generative AI.
-  We express our sincere gratitude for its significant contributions to shaping this document.
-* License: MIT License
-=======
 Such comments clarify IntentScript's intent and assist in implementation and verification.
-
-## Future Considerations
-
-While this specification maintains a minimal configuration, the following are issues under consideration for future expansion:
-
-* Error handling and validation
-* Practical notations such as enumerated types, dependent types, and conditional constraints
-* Support for composite types (Union / Intersection types)
-  * Introduction of composite types like int | null and A & B
-* Introduction of generic entity definitions (e.g., User<T>)
-  * Enable entity reuse through type parameters, supporting flexible construction of complex domain models
-* Introduction of package configuration (namespace and scope management) for large-scale development
-* Consideration of `include` functionality enabling definition reuse and split description
-* Templates and other grammar for reuse
-* Consistency verification with natural language comments and AI-based completion/suggestion support for ambiguous expressions
 
 ## About This Document
 
 * Version: 0.0.1
 * Status: This specification represents the minimal configuration specification for the POC (Proof of Concept) stage of IntentScript.
   It is intended for initial design verification and confirmation of the language's effectiveness, positioned as a foundation for future expansion and formal specification.
-* Co-authorship: This specification was created through dialogue with generative AI. We express our gratitude for the significant contributions of generative AI in forming this specification.
+* Guiding principle: Emphasizes flexibility and AI-driven interpretation over exhaustiv
+* Co-authorship: This specification was created through dialogue with LLM. We express our gratitude for the significant contributions of LLM in forming this specification.
 * License: This specification is published under the MIT License.
->>>>>>> 368c8c5 (tmp)
 
 This document serves as a starting point for developing IntentScript as a "language for conveying intent to AI" and is intended to provide a foundation for future discussion, implementation, and utilization.
