@@ -90,7 +90,6 @@ The following items are under consideration for future extension.
 
 * Error handling and validation expression
 * Enumerated, dependent, and conditional constraint types
-* Composite types (e.g., union/intersection)
 * Generic entity definitions (e.g., User<T>) for reuse
 * Modular package structure for large-scale systems (namespaces and scope management)
 * Template definitions and reuse mechanisms
